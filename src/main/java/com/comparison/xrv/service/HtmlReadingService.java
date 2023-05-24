@@ -7,6 +7,5 @@ import java.util.Map;
 import com.comparison.xrv.model.ValidationRow;
 
 public interface HtmlReadingService {
-
-    List<ValidationRow> read(Path path);
+    Map<String, List<ValidationRow>> read(Path dir);
 }

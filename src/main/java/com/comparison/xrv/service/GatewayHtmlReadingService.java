@@ -14,29 +14,26 @@ import com.comparison.xrv.model.ValidationRow;
 
 import lombok.SneakyThrows;
 
-public class GatewayHtmlReadingService implements HtmlReadingService {
-
+public class GatewayHtmlReadingService extends BaseHtmlReadingService {
     @SneakyThrows
     @Override
-    public List<ValidationRow> read(final Path path) {
-        Document document = Jsoup.parse(path.toFile(), Charset.defaultCharset().name());
+    public List<ValidationRow> readHtmlFile(final Path path) {
+        final Document document = Jsoup.parse(path.toFile(), Charset.defaultCharset().name());
 
-        Element table = document.select("table").get(2);
-        Elements rows = table.select("tr");
+        final Element table = document.select(TABLE).last();
+        final Elements rows = table.select(TR);
 
-        List<ValidationRow> result = new ArrayList<>(rows.size() - 1);
+        final List<ValidationRow> result = new ArrayList<>(rows.size() - 1);
         for (int i = 1; i < rows.size(); i++) {
+            final Elements td = rows.get(i).getAllElements();
 
-            Element row = rows.get(i);
-            Elements td = row.getAllElements();
+            final var level = td.get(2).text();
+            final var ruleId = td.get(4).text();
+            final int line = Integer.valueOf(td.get(5).text().trim());
+            final int column = Integer.valueOf(td.get(6).text().trim());
+            final var message = td.get(8).text();
 
-            var level = td.get(2).text();
-            var ruleId = td.get(4).text();
-            var line = Integer.valueOf(td.get(5).text());
-            var column = Integer.valueOf(td.get(6).text());
-            var message = td.get(8).text();
-
-            var validationRow = ValidationRow.of(level, ruleId, line, column, message);
+            final var validationRow = ValidationRow.of(level, ruleId, line, column, message);
             result.add(validationRow);
         }
 
