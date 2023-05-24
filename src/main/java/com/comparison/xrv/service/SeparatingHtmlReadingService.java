@@ -26,7 +26,7 @@ abstract class SeparatingHtmlReadingService extends BaseHtmlReadingService {
         final Element table = getTable(document);
         final Elements rows = table.select(TR);
 
-        final List<ValidationRow> result = new ArrayList<>();
+        final List<ValidationRow> result = new ArrayList<>(rows.size() - 1);
 
         for (int i = 1; i < rows.size(); i++) {
             final Elements td = rows.get(i).getAllElements();
