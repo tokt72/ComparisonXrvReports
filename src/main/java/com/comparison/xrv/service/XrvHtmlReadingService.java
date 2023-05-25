@@ -24,16 +24,18 @@ public class XrvHtmlReadingService extends SeparatingHtmlReadingService {
 
     @Override
     protected int getLineByTd(final Elements td) {
-        return Integer.valueOf(td.get(6).text());
+        return Integer.parseInt(td.get(6).text());
     }
 
     @Override
     protected int getColumnByTd(final Elements td) {
-        return Integer.valueOf(td.get(7).text());
+        return Integer.parseInt(td.get(7).text());
     }
 
     @Override
     protected String getMessageByTd(final Elements td) {
-        return td.get(9).text();
+        return td.get(9).text().replace(". ",".").replace("<url>.","<url>. ")
+                .replace("(\"hyperlink\" not allowed)","").replace("..",".")
+                .replace(".If",". If");
     }
 }
