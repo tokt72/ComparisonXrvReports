@@ -29,8 +29,8 @@ public class GatewayHtmlReadingService extends BaseHtmlReadingService {
 
             final var level = td.get(2).text();
             final var ruleId = td.get(4).text();
-            final int line = Integer.valueOf(td.get(5).text().trim());
-            final int column = Integer.valueOf(td.get(6).text().trim());
+            final int line = Integer.parseInt(td.get(5).text().trim());
+            final int column = Integer.parseInt(td.get(6).text().trim());
             final var message = td.get(8).text();
 
             final var validationRow = ValidationRow.of(level, ruleId, line, column, message);

@@ -45,8 +45,8 @@ abstract class SeparatingHtmlReadingService extends BaseHtmlReadingService {
 
                 while (stringTokenizer.hasMoreTokens()) {
                     final String[] nextToken = stringTokenizer.nextToken().split(":");
-                    final int newLine = Integer.valueOf(nextToken[0].trim());
-                    final int newColumn = Integer.valueOf(nextToken[1].trim());
+                    final int newLine = Integer.parseInt(nextToken[0].trim());
+                    final int newColumn = Integer.parseInt(nextToken[1].trim());
 
                     final var additionRow = ValidationRow.of(level, ruleId, newLine, newColumn, newMessage);
                     result.add(additionRow);

@@ -23,12 +23,12 @@ public class VendorToolHtmlReadingService extends SeparatingHtmlReadingService {
 
     @Override
     protected int getLineByTd(final Elements td) {
-        return Integer.valueOf(td.get(5).text());
+        return Integer.parseInt(td.get(5).text());
     }
 
     @Override
     protected int getColumnByTd(final Elements td) {
-        return Integer.valueOf(td.get(6).text());
+        return Integer.parseInt(td.get(6).text());
     }
 
     @Override
