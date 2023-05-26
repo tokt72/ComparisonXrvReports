@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import com.comparison.xrv.service.GatewayHtmlReadingService;
 import com.comparison.xrv.service.HtmlReadingService;
@@ -35,11 +34,11 @@ public class Test {
         assertEquals(xrvReport.keySet(), gatewayReport.keySet());
 
         List<String[]> success = new ArrayList<>();
-        String[] headerSuccess = {"Level", "Rule", "Id", "Line", "Column", "Message"};
+        String[] headerSuccess = {"articleId", "Level", "Rule", "Line", "Column", "Message"};
         success.add(headerSuccess);
 
         List<String[]> failed = new ArrayList<>();
-        String[] headerFailed = {"Level", "Rule", "Id", "Line", "Column", "Message"};
+        String[] headerFailed = {"articleId", "Level", "Rule", "Line", "Column", "Message"};
         failed.add(headerFailed);
 
         for (String key : xrvReport.keySet()) {
@@ -50,10 +49,19 @@ public class Test {
             assertEquals(gatewayValidationRows.size(), gatewayValidationRows.size());
 
             for (int i = 0; i < xrvValidationRows.size(); i++) {
+                final var row = xrvValidationRows.get(i);
+                final String[] line = new String[]{
+                        row.getArticleID(),
+                        row.getLevel(),
+                        row.getRuleId(),
+                        String.valueOf(row.getLine()),
+                        String.valueOf(row.getColumn()),
+                        row.getMessage()
+                };
                 if (xrvValidationRows.contains(gatewayValidationRows.get(i))) {
-                    success.add(new String[]{xrvValidationRows.get(i).toString()});
+                    success.add(line);
                 } else {
-                    failed.add(new String[]{xrvValidationRows.get(i).toString()});
+                    failed.add(line);
                 }
             }
 

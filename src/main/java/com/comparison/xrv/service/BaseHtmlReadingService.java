@@ -38,4 +38,9 @@ abstract class BaseHtmlReadingService implements HtmlReadingService {
     }
 
     protected abstract List<ValidationRow> readHtmlFile(Path file);
+
+
+//    public String getArticleId()    {
+//
+//    }
 }

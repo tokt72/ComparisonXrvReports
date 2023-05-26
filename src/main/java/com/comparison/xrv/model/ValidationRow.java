@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "of")
 public class ValidationRow {
+    private final String articleID;
     private final String level;
     private final String ruleId;
     private final int line;

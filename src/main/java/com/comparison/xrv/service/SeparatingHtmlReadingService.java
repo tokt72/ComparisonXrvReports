@@ -31,6 +31,13 @@ abstract class SeparatingHtmlReadingService extends BaseHtmlReadingService {
         for (int i = 1; i < rows.size(); i++) {
             final Elements td = rows.get(i).getAllElements();
 
+            final var filename = path.getFileName().toString();
+            final var separator = filename.indexOf("_");
+            if (separator == -1) {
+                throw new IllegalArgumentException("Incorrect filename " + filename);
+            }
+
+            final var articleId =  path.getFileName().toString().substring(0, separator).toUpperCase();
             final var level = getLevelByTd(td);
             final var ruleId = getRuleIdByTd(td);
             final int line = getLineByTd(td);
@@ -48,13 +55,13 @@ abstract class SeparatingHtmlReadingService extends BaseHtmlReadingService {
                     final int newLine = Integer.parseInt(nextToken[0].trim());
                     final int newColumn = Integer.parseInt(nextToken[1].trim());
 
-                    final var additionRow = ValidationRow.of(level, ruleId, newLine, newColumn, newMessage);
+                    final var additionRow = ValidationRow.of(articleId, level, ruleId, newLine, newColumn, newMessage);
                     result.add(additionRow);
                 }
 
-                validationRow = ValidationRow.of(level, ruleId, line, column, newMessage);
+                validationRow = ValidationRow.of(articleId, level, ruleId, line, column, newMessage);
             } else {
-                validationRow = ValidationRow.of(level, ruleId, line, column, message);
+                validationRow = ValidationRow.of(articleId, level, ruleId, line, column, message);
             }
 
             result.add(validationRow);
