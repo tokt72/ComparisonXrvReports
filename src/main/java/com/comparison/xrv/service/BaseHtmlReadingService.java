@@ -26,11 +26,14 @@ abstract class BaseHtmlReadingService implements HtmlReadingService {
                 .filter(Files::isRegularFile)
                 .forEach(path -> {
                     final var filename = path.getFileName().toString();
-                    final var separator = filename.indexOf("_");
-                    if (separator == -1) {
+                    final var dot = filename.lastIndexOf('.');
+                    if (dot <= 0) {
                         throw new IllegalArgumentException("Incorrect filename " + filename);
                     }
-                    final var articleId = filename.substring(0, separator).toUpperCase();
+                    final var baseName = filename.substring(0, dot);
+                    final var separator = baseName.indexOf("_");
+                    final var articleId = (separator == -1 ? baseName : baseName.substring(0, separator))
+                            .toUpperCase();
                     final var rows = readHtmlFile(path);
                     result.computeIfAbsent(articleId, a -> new ArrayList<>()).addAll(rows);
                 });
