@@ -17,28 +17,36 @@ public class ComparisonService {
             final Map<String, List<ValidationRow>> xrvReport,
             final Map<String, List<ValidationRow>> gatewayReport
     ) {
+        return compare(xrvReport, gatewayReport, "jqa_gateway");
+    }
+
+    public ComparisonResult compare(
+            final Map<String, List<ValidationRow>> xrvReport,
+            final Map<String, List<ValidationRow>> sourceReport,
+            final String sourceName
+    ) {
         final List<ComparisonRecord> records = new ArrayList<>();
         int successCount = 0;
         int failedCount = 0;
 
         final Set<String> allArticleIds = new HashSet<>(xrvReport.keySet());
-        allArticleIds.addAll(gatewayReport.keySet());
+        allArticleIds.addAll(sourceReport.keySet());
 
         for (String articleId : allArticleIds) {
             final List<ValidationRow> xrvValidationRows = xrvReport.getOrDefault(articleId, List.of());
-            final List<ValidationRow> gatewayValidationRows = gatewayReport.getOrDefault(articleId, List.of());
-            final List<ValidationRow> unmatchedGatewayRows = new ArrayList<>(gatewayValidationRows);
+            final List<ValidationRow> sourceValidationRows = sourceReport.getOrDefault(articleId, List.of());
+            final List<ValidationRow> unmatchedSourceRows = new ArrayList<>(sourceValidationRows);
 
             for (ValidationRow xrvRow : xrvValidationRows) {
-                if (removeEquivalentRow(unmatchedGatewayRows, xrvRow)) {
+                if (removeEquivalentRow(unmatchedSourceRows, xrvRow)) {
                     records.add(toRecord(ComparisonStatus.SUCCESS, articleId, xrvRow, xrvRow, "both", ""));
                     successCount++;
                 } else {
-                    final int candidateIndex = findSamePositionRowIndex(unmatchedGatewayRows, xrvRow);
+                    final int candidateIndex = findSamePositionRowIndex(unmatchedSourceRows, xrvRow);
                     if (candidateIndex >= 0) {
-                        final ValidationRow gatewayRow = unmatchedGatewayRows.remove(candidateIndex);
-                        final String diff = MessageDiffService.buildDiff(xrvRow.getMessage(), gatewayRow.getMessage());
-                        records.add(toRecord(ComparisonStatus.FAILED, articleId, xrvRow, gatewayRow, "both", diff));
+                        final ValidationRow sourceRow = unmatchedSourceRows.remove(candidateIndex);
+                        final String diff = MessageDiffService.buildDiff(xrvRow.getMessage(), sourceRow.getMessage());
+                        records.add(toRecord(ComparisonStatus.FAILED, articleId, xrvRow, sourceRow, "both", diff));
                     } else {
                         records.add(toRecord(
                                 ComparisonStatus.FAILED,
@@ -53,14 +61,14 @@ public class ComparisonService {
                 }
             }
 
-            for (ValidationRow gatewayOnlyRow : unmatchedGatewayRows) {
+            for (ValidationRow sourceOnlyRow : unmatchedSourceRows) {
                 records.add(toRecord(
                         ComparisonStatus.FAILED,
                         articleId,
                         null,
-                        gatewayOnlyRow,
-                        "jqa_gateway",
-                        "Message exists only in jqa_gateway"
+                        sourceOnlyRow,
+                        sourceName,
+                        "Message exists only in " + sourceName
                 ));
                 failedCount++;
             }
@@ -73,11 +81,11 @@ public class ComparisonService {
             final ComparisonStatus status,
             final String articleId,
             final ValidationRow xrvRow,
-            final ValidationRow gatewayRow,
+            final ValidationRow sourceRow,
             final String source,
             final String diff
     ) {
-        final ValidationRow baseRow = xrvRow != null ? xrvRow : gatewayRow;
+        final ValidationRow baseRow = xrvRow != null ? xrvRow : sourceRow;
         return ComparisonRecord.of(
                 status,
                 articleId,
@@ -86,7 +94,7 @@ public class ComparisonService {
                 baseRow.getLine(),
                 baseRow.getColumn(),
                 xrvRow != null ? xrvRow.getMessage() : "",
-                gatewayRow != null ? gatewayRow.getMessage() : "",
+                sourceRow != null ? sourceRow.getMessage() : "",
                 diff,
                 source
         );

@@ -6,22 +6,24 @@ import java.util.List;
 import com.comparison.xrv.model.ComparisonRecord;
 
 public class ComparisonReportRowMapper {
-    private static final String[] HEADER = {
-            "Result",
-            "ArticleId",
-            "Level",
-            "Rule",
-            "Line",
-            "Column",
-            "Message XRV",
-            "Message JQA",
-            "Message Diff",
-            "Source"
-    };
-
     public List<String[]> toExcelRows(final List<ComparisonRecord> records) {
+        return toExcelRows(records, "JQA");
+    }
+
+    public List<String[]> toExcelRows(final List<ComparisonRecord> records, final String sourceLabel) {
         final List<String[]> rows = new ArrayList<>(records.size() + 1);
-        rows.add(HEADER);
+        rows.add(new String[]{
+                "Result",
+                "ArticleId",
+                "Level",
+                "Rule",
+                "Line",
+                "Column",
+                "Message XRV",
+                "Message " + sourceLabel,
+                "Message Diff",
+                "Source"
+        });
 
         for (ComparisonRecord record : records) {
             rows.add(new String[]{
